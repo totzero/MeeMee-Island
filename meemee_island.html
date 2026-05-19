@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猪咩岛漫游 MeeMee Island</title>
+<style>
+  :root {
+    --green:#A8B977; --green-d:#8a9960; --green-l:#dde8c8;
+    --red:#DC312F; --red-l:#f5d0cf;
+    --peach:#EB9977; --peach-l:#fae4d8;
+    --mint:#AAC6AD; --mint-l:#daeedd;
+    --choco:#422B21; --choco-m:#6b4637;
+    --yellow:#E4D085;
+    --cream:#E8F0F4; --cream2:#EFF5F8;
+    --ink:#2c2018; --muted:#7a6a5a;
+    --gl:rgba(66,43,33,.06);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Georgia','Noto Serif SC',serif;background:var(--cream);color:var(--ink);overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);
+    background-size:32px 32px;}
+  section,header,footer{position:relative;z-index:1;}
+  #kv::after,#characters::after,#story::after,#author::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);
+    background-size:32px 32px;}
+  #kv>*,#characters>*,#story>*,#author>*{position:relative;z-index:1;}
+
+  /* ── BUTTONS ── */
+  .btn{display:inline-flex;align-items:center;position:relative;overflow:hidden;border-radius:100px;font-family:inherit;font-size:13px;letter-spacing:.1em;text-decoration:none;cursor:pointer;border:none;padding:0;transition:box-shadow .25s;}
+  .btn-inner{display:flex;align-items:center;gap:12px;padding:13px 28px 13px 24px;position:relative;z-index:1;transition:transform .3s cubic-bezier(.4,0,.2,1);}
+  .btn:hover .btn-inner{transform:translateX(4px);}
+  .btn-arrow{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;flex-shrink:0;margin-right:4px;transition:transform .3s cubic-bezier(.4,0,.2,1);}
+  .btn:hover .btn-arrow{transform:translateX(4px);}
+  .btn-arrow svg{width:14px;height:14px;}
+  .btn-choco{background:var(--choco);color:var(--cream2);}.btn-choco .btn-arrow{background:rgba(255,255,255,.12);}.btn-choco:hover{box-shadow:0 6px 24px rgba(66,43,33,.28);}
+  .btn-green{background:var(--green);color:var(--choco);}.btn-green .btn-arrow{background:rgba(255,255,255,.25);}.btn-green:hover{box-shadow:0 6px 24px rgba(168,185,119,.35);}
+  .btn-yellow{background:var(--yellow);color:var(--choco);}.btn-yellow .btn-arrow{background:rgba(255,255,255,.3);}.btn-yellow:hover{box-shadow:0 6px 24px rgba(228,208,133,.5);}
+
+  /* ── HEADER ── */
+  header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px 0 36px;height:64px;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);box-shadow:0 2px 16px rgba(66,43,33,.07);}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
+  .logo-mark{width:32px;height:32px;border-radius:50%;background:var(--choco);display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .logo-text .cn{font-size:12.5px;font-weight:700;color:var(--choco);letter-spacing:.08em;display:block;}
+  .logo-text .en{font-size:8.5px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;display:block;margin-top:1px;}
+
+  /* desktop nav */
+  .header-center{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;}
+  nav{display:flex;align-items:center;}
+  nav a{font-size:12px;color:var(--choco);text-decoration:none;letter-spacing:.12em;font-family:sans-serif;position:relative;padding:0 22px 3px;transition:opacity .2s;cursor:pointer;display:flex;align-items:center;gap:5px;}
+  nav a .nav-tri{width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:4px solid var(--choco);opacity:.45;flex-shrink:0;margin-top:1px;transition:opacity .2s;}
+  nav a::after{content:'';position:absolute;bottom:0;left:22px;width:0;height:1px;background:var(--choco);transition:width .28s ease;}
+  nav a:hover{opacity:.6;}
+  nav a:hover::after{width:calc(100% - 44px);}
+  .nav-divider{width:1px;height:14px;background:rgba(66,43,33,.2);flex-shrink:0;}
+
+  /* hamburger (hidden on desktop) */
+  .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none;}
+  .hamburger span{display:block;width:22px;height:1.5px;background:var(--choco);border-radius:2px;transition:transform .3s,opacity .3s;}
+  .hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+  .hamburger.open span:nth-child(2){opacity:0;}
+  .hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+  /* mobile menu */
+  .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(255,255,255,.98);backdrop-filter:blur(14px);z-index:99;flex-direction:column;border-bottom:1px solid rgba(66,43,33,.08);box-shadow:0 8px 24px rgba(66,43,33,.07);}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{font-size:14px;color:var(--choco);text-decoration:none;letter-spacing:.1em;font-family:sans-serif;padding:16px 36px;border-bottom:0.5px solid rgba(66,43,33,.06);display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .mobile-menu a svg{width:14px;height:14px;stroke:var(--choco);fill:none;stroke-width:1.8;opacity:.4;}
+
+  @media(max-width:768px){
+    .header-center{display:none;}
+    .hamburger{display:flex;}
+    .logo-text .en{display:none;}
+  }
+
+  /* ── HELLO PAGE ── */
+  #hello{position:fixed;inset:0;z-index:999;background:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px;transition:opacity .8s ease,transform .8s ease;}
+  #hello::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(var(--gl) 1px,transparent 1px),linear-gradient(90deg,var(--gl) 1px,transparent 1px);background-size:32px 32px;}
+  #hello.hide{opacity:0;transform:translateY(-24px);pointer-events:none;}
+  .hello-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;}
+  .hello-eyebrow{display:inline-flex;align-items:center;gap:8px;background:white;border:1px solid rgba(168,185,119,.35);border-radius:100px;padding:6px 18px;font-size:12px;letter-spacing:.15em;color:var(--green-d);font-family:sans-serif;opacity:0;animation:helloFadeUp .7s ease .2s forwards;}
+  .hello-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .hello-title{font-size:clamp(40px,7vw,88px);font-weight:400;color:var(--choco);line-height:1.22;letter-spacing:.04em;opacity:0;animation:helloFadeUp .7s ease .4s forwards;}
+  .hello-title em{font-style:normal;color:var(--green-d);border-bottom:2.5px solid var(--green);}
+  .hello-desc{font-size:15px;color:var(--muted);line-height:2;font-family:sans-serif;opacity:0;animation:helloFadeUp .7s ease .6s forwards;}
+  .hello-btn{margin-top:12px;opacity:0;animation:helloFadeUp .7s ease .85s forwards;}
+  .hello-progress{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:120px;height:1.5px;background:rgba(66,43,33,.12);border-radius:2px;overflow:hidden;}
+  .hello-progress-fill{height:100%;width:0;background:var(--green);animation:progressFill 3s ease 1.2s forwards;}
+  @keyframes helloFadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes progressFill{from{width:0;}to{width:100%;}}
+  #mainContent{opacity:0;transition:opacity .6s ease;}
+  #mainContent.visible{opacity:1;}
+
+  /* ── KV ── */
+  #kv{position:relative;overflow:hidden;}
+  .kv-scrim{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(232,240,244,.55) 0%,rgba(232,240,244,.25) 60%,rgba(232,240,244,.1) 100%);pointer-events:none;z-index:9;}
+  .kv-overlay{position:absolute;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:20px;padding:48px;}
+  .kv-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border:1px solid rgba(168,185,119,.4);border-radius:100px;padding:6px 18px;font-size:11px;letter-spacing:.15em;color:var(--green-d);font-family:sans-serif;}
+  .kv-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--green);}
+  .kv-title{font-size:clamp(36px,5vw,68px);font-weight:400;color:var(--choco);line-height:1.22;letter-spacing:.04em;text-shadow:0 2px 24px rgba(232,240,244,.9);}
+  .kv-title em{font-style:normal;color:var(--green-d);border-bottom:2.5px solid var(--green);}
+  .kv-desc{font-size:14px;color:var(--choco);line-height:1.9;font-family:sans-serif;background:rgba(255,255,255,.72);backdrop-filter:blur(8px);padding:10px 22px;border-radius:12px;opacity:.9;}
+  .kv-map-wrap{width:100%;}
+  .map-frame{width:100%;height:calc(100vh - 64px);background:linear-gradient(160deg,#c8e8f5 0%,#b0d8ec 100%);position:relative;overflow:hidden;}
+  .map-tooltip{position:absolute;z-index:20;background:var(--choco);color:var(--cream2);border-radius:10px;padding:8px 14px;font-size:11.5px;letter-spacing:.06em;font-family:sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .2s;transform:translate(-50%,-110%);}
+  .map-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--choco);}
+  .map-dot{position:absolute;width:14px;height:14px;border-radius:50%;cursor:pointer;z-index:10;transform:translate(-50%,-50%);transition:transform .2s;}
+  .map-dot::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid currentColor;opacity:.4;animation:ping 2s ease-in-out infinite;}
+  .map-dot:hover{transform:translate(-50%,-50%) scale(1.4);}
+  @keyframes ping{0%,100%{transform:scale(1);opacity:.4;}50%{transform:scale(1.5);opacity:0;}}
+
+  /* ── SECTION COMMON ── */
+  .sec-wrap{max-width:1120px;margin:0 auto;padding:0 56px;}
+  .sec-head{text-align:center;margin-bottom:56px;}
+  .sec-en{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--green-d);margin-bottom:10px;display:block;font-family:sans-serif;}
+  .sec-title{font-size:clamp(26px,3vw,40px);font-weight:400;color:var(--choco);letter-spacing:.05em;}
+  .sec-line{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:18px;}
+  .sec-line span{width:32px;height:1px;background:var(--green);}
+  .sec-line i{width:6px;height:6px;border-radius:50%;background:var(--peach);}
+
+  /* ── CHARACTERS ── */
+  #characters{padding:100px 0;background:var(--cream2);overflow:hidden;}
+  .char-rail-wrap{position:relative;padding:0 56px 16px;}
+  .char-rail{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px;cursor:grab;}
+  .char-rail::-webkit-scrollbar{display:none;}
+  .char-rail.grabbing{cursor:grabbing;}
+
+  /* card — all info inside */
+  .char-card{
+    flex:0 0 240px;
+    background:white;border-radius:16px;overflow:hidden;
+    scroll-snap-align:start;
+    border:2px solid transparent;
+    transition:border-color .25s,transform .25s,box-shadow .25s;
+    user-select:none;
+  }
+  .char-card:hover{transform:translateY(-6px);box-shadow:0 14px 40px rgba(66,43,33,.10);}
+  .char-img{width:100%;height:200px;overflow:hidden;}
+  .char-img .c-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;}
+  .char-img .c-emoji{font-size:48px;opacity:.55;}
+  .char-img .c-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.4;font-family:sans-serif;text-align:center;padding:0 6px;}
+  .char-img .c-dim{font-size:8px;color:var(--muted);opacity:.3;font-family:sans-serif;}
+  .char-strip{height:3px;}
+  .char-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:10px;}
+  .char-name-row{display:flex;flex-direction:column;gap:2px;}
+  .char-name{font-size:15px;font-weight:400;color:var(--choco);}
+  .char-en{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:sans-serif;}
+  .char-role-tag{display:inline-block;font-size:10px;padding:3px 11px;border-radius:100px;background:rgba(66,43,33,.07);color:var(--choco-m);font-family:sans-serif;letter-spacing:.04em;width:fit-content;}
+  .char-info-list{display:flex;flex-direction:column;gap:7px;border-top:0.5px solid rgba(66,43,33,.08);padding-top:10px;}
+  .char-info-row{display:flex;gap:8px;font-size:11.5px;line-height:1.6;font-family:sans-serif;}
+  .char-info-label{font-size:9.5px;letter-spacing:.06em;color:var(--muted);min-width:28px;margin-top:1px;flex-shrink:0;}
+  .char-info-val{color:var(--choco-m);flex:1;}
+
+  /* dot indicator */
+  .char-dots{display:flex;justify-content:center;gap:7px;padding:16px 0 8px;}
+  .char-dot{width:6px;height:6px;border-radius:50%;background:rgba(66,43,33,.15);transition:background .25s,transform .25s;cursor:pointer;}
+  .char-dot.active{background:var(--choco);transform:scale(1.3);}
+
+  /* scroll arrows */
+  .rail-arrow{position:absolute;top:38%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:white;border:1px solid rgba(66,43,33,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;box-shadow:0 2px 12px rgba(66,43,33,.08);transition:background .2s;}
+  .rail-arrow:hover{background:var(--choco);color:white;}
+  .rail-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .rail-arrow.left{left:8px;}
+  .rail-arrow.right{right:8px;}
+
+  /* ── STORY ── */
+  #story{padding:100px 0 120px;background:var(--cream);overflow:hidden;}
+  .story-layout{max-width:1120px;margin:0 auto;padding:0 56px;display:grid;grid-template-columns:200px 1fr;gap:0 48px;align-items:start;min-height:640px;}
+  .story-left{position:sticky;top:100px;display:flex;flex-direction:column;gap:24px;padding-top:40px;}
+  .story-eyebrow{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--green-d);font-family:sans-serif;}
+  .story-vtitle{writing-mode:vertical-rl;font-size:clamp(28px,3vw,42px);font-weight:400;color:var(--choco);letter-spacing:.12em;line-height:1.3;}
+  .story-vbody{writing-mode:vertical-rl;font-size:12.5px;color:var(--muted);line-height:2;letter-spacing:.08em;font-family:sans-serif;}
+  .story-mosaic{position:relative;height:680px;margin-bottom:-200px;}
+  .mosaic-img{position:absolute;border-radius:12px;overflow:hidden;border:3px solid white;box-shadow:0 6px 28px rgba(66,43,33,.10);}
+  .mosaic-img .m-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;}
+  .mosaic-img .m-emoji{font-size:28px;opacity:.5;}
+  .mosaic-img .m-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);opacity:.5;text-align:center;padding:0 8px;font-family:sans-serif;}
+  .mi-1{width:46%;aspect-ratio:4/3;top:0;left:4%;z-index:3;background:linear-gradient(135deg,var(--green-l),var(--mint-l));}
+  .mi-2{width:34%;aspect-ratio:3/4;top:20px;left:52%;z-index:4;background:linear-gradient(135deg,var(--red-l),var(--peach-l));}
+  .mi-3{width:38%;aspect-ratio:1;top:36%;left:0%;z-index:2;background:linear-gradient(135deg,var(--peach-l),var(--yellow));}
+  .mi-4{width:50%;aspect-ratio:4/3;top:30%;left:40%;z-index:3;background:linear-gradient(135deg,var(--mint-l),#c8e8f0);}
+  .mi-5{width:26%;aspect-ratio:3/4;top:22%;left:36%;z-index:5;background:linear-gradient(135deg,var(--yellow),var(--green-l));}
+  .story-foot{margin-top:48px;padding-left:56px;text-align:center;}
+  .story-quote{font-size:clamp(15px,1.8vw,20px);font-weight:400;color:var(--choco);line-height:1.8;letter-spacing:.04em;margin-bottom:10px;}
+  .story-sub{font-size:12.5px;color:var(--muted);line-height:2;max-width:480px;margin:0 auto 28px;font-family:sans-serif;}
+
+  /* ── FORTUNE ARCH ── */
+  .fortune-arch-wrap{background:var(--choco);position:relative;overflow:hidden;}
+  .arch-ticker{background:var(--green);padding:8px 0;overflow:hidden;white-space:nowrap;}
+  .arch-ticker-inner{display:inline-block;animation:tickerScroll 22s linear infinite;white-space:nowrap;}
+  .arch-ticker span{font-size:11px;letter-spacing:.18em;color:var(--choco);padding:0 28px;font-family:sans-serif;}
+  .arch-ticker span::before{content:'✦';margin-right:28px;opacity:.6;}
+  @keyframes tickerScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .arch-shape{position:relative;width:100%;padding-bottom:32px;}
+  .arch-dome{width:72%;max-width:860px;margin:0 auto;background:var(--peach-l);border-radius:0 0 50% 50%/0 0 100% 100%;padding:56px 48px 72px;text-align:center;position:relative;overflow:hidden;}
+  .arch-dome::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(235,153,119,.18) 1.5px,transparent 1.5px);background-size:22px 22px;border-radius:inherit;}
+  .arch-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--choco);opacity:.55;margin-bottom:18px;display:block;font-family:sans-serif;position:relative;z-index:1;}
+  .arch-title{font-size:clamp(42px,7vw,88px);font-weight:400;color:var(--choco);letter-spacing:.06em;line-height:1;position:relative;z-index:1;margin-bottom:14px;}
+  .arch-desc{font-size:13px;color:var(--choco);opacity:.6;line-height:1.9;position:relative;z-index:1;font-family:sans-serif;letter-spacing:.06em;}
+
+  /* ── FORTUNE ── */
+  #fortune{padding:0 0 80px;background:var(--choco);position:relative;overflow:hidden;}
+  #fortune::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(168,185,119,.07) 1.5px,transparent 1.5px);background-size:28px 28px;}
+  .fortune-inner{max-width:580px;margin:0 auto;text-align:center;position:relative;z-index:1;padding:48px 24px 0;}
+  .fortune-tag{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--green);margin-bottom:16px;display:block;font-family:sans-serif;}
+  .dice-stage{height:56px;margin-bottom:16px;display:flex;align-items:center;justify-content:center;}
+  .dice-emoji{font-size:36px;display:inline-block;}
+  .dice-emoji.rolling{animation:diceRoll .6s ease;}
+  @keyframes diceRoll{0%{transform:rotate(0) scale(1);}20%{transform:rotate(-20deg) scale(1.15);}40%{transform:rotate(15deg) scale(.9);}60%{transform:rotate(-10deg) scale(1.1);}80%{transform:rotate(6deg) scale(.95);}100%{transform:rotate(0) scale(1);}}
+  .slip-wrap{margin-bottom:24px;min-height:200px;display:flex;align-items:center;justify-content:center;}
+  .slip-card{background:var(--cream2);border-radius:16px;width:100%;max-width:400px;overflow:hidden;transform:rotateX(90deg) scale(.85);opacity:0;transition:transform .55s cubic-bezier(.34,1.56,.64,1),opacity .4s ease;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+  .slip-card.dropped{transform:rotateX(0deg) scale(1);opacity:1;}
+  .slip-img{width:100%;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;flex-shrink:0;}
+  .slip-img-emoji{font-size:56px;}
+  .slip-img-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.4;font-family:sans-serif;}
+  .slip-type{display:inline-block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:2px 10px;border-radius:100px;margin-bottom:8px;font-family:sans-serif;}
+  .type-weather{background:rgba(170,198,173,.25);color:#2a6040;}
+  .type-npc{background:rgba(235,153,119,.25);color:#7a3010;}
+  .type-item{background:rgba(228,208,133,.3);color:#6a5010;}
+  .slip-body{padding:18px 22px 22px;text-align:left;}
+  .slip-head{font-size:16px;color:var(--choco);line-height:1.45;margin-bottom:8px;font-weight:400;}
+  .slip-text{font-size:12.5px;color:var(--muted);line-height:1.9;font-family:sans-serif;}
+  .slip-effect{margin-top:10px;font-size:11px;padding:5px 13px;background:rgba(168,185,119,.13);border-radius:100px;display:inline-block;color:var(--green-d);font-family:sans-serif;}
+  .f-idle{font-size:12px;letter-spacing:.12em;color:rgba(240,237,230,.28);font-family:sans-serif;text-align:center;}
+  .f-count{font-size:11px;color:rgba(240,237,230,.28);margin-top:10px;letter-spacing:.06em;font-family:sans-serif;}
+
+  /* ── AUTHOR ── */
+  #author{padding:100px 0;background:var(--cream2);}
+  .author-inner{max-width:680px;margin:0 auto;text-align:center;}
+  .author-img{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--peach-l),var(--yellow));margin:0 auto 22px;display:flex;align-items:center;justify-content:center;border:2px dashed rgba(66,43,33,.18);flex-direction:column;gap:2px;opacity:.7;}
+  .author-img .ai-icon{font-size:24px;opacity:.6;}
+  .author-img .ai-txt{font-size:8px;letter-spacing:.06em;color:var(--muted);font-family:sans-serif;}
+  .author-name{font-size:21px;font-weight:400;color:var(--choco);margin-bottom:5px;}
+  .author-role{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;font-family:sans-serif;}
+  .author-bio{font-size:13.5px;color:var(--muted);line-height:2.1;margin:0 auto 36px;max-width:440px;font-family:sans-serif;}
+
+  /* unified social buttons */
+  .social-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .social-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    width:160px;
+    background:var(--choco);color:var(--cream2);
+    border:none;border-radius:100px;padding:14px 0;
+    font-size:13px;letter-spacing:.1em;font-family:sans-serif;
+    text-decoration:none;cursor:pointer;
+    transition:box-shadow .25s,opacity .2s;
+  }
+  .social-btn:hover{opacity:.82;box-shadow:0 6px 24px rgba(66,43,33,.28);}
+  .social-btn .s-icon{font-size:16px;}
+
+  /* ── FOOTER ── */
+  footer{padding:36px 56px;background:var(--choco);border-top:1px solid rgba(168,185,119,.15);}
+  .footer-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+  .footer-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .footer-logo-mark{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .footer-logo-text{font-size:11px;color:rgba(240,237,230,.45);letter-spacing:.1em;font-family:sans-serif;}
+  .footer-social{display:flex;gap:12px;}
+  .footer-social a{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:rgba(240,237,230,.5);transition:background .2s;}
+  .footer-social a:hover{background:rgba(255,255,255,.1);color:var(--cream2);}
+  .footer-copy{font-size:11px;color:rgba(240,237,230,.25);letter-spacing:.08em;font-family:sans-serif;}
+
+  /* ── REVEAL ── */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .reveal-d1{transition-delay:.1s;}
+  .reveal-d2{transition-delay:.2s;}
+</style>
+</head>
+<body>
+
+<!-- HELLO -->
+<div id="hello">
+  <div class="hello-inner">
+    <div class="hello-eyebrow"><span class="dot"></span>Welcome to MeeMee Island</div>
+    <div class="hello-title">在云端，<br>遇见<em>最软萌</em>的自己</div>
+    <p class="hello-desc">这里是漂浮在天空之上的小岛。<br>奶茶猪与汽水咩在这里收集云朵、制造快乐。</p>
+    <div class="hello-btn">
+      <button class="btn btn-choco" id="enterBtn">
+        <span class="btn-inner">进入猪咩岛</span>
+        <span class="btn-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></span>
+      </button>
+    </div>
+  </div>
+  <div class="hello-progress"><div class="hello-progress-fill"></div></div>
+</div>
+
+<div id="mainContent">
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">
+    <div class="logo-mark">🐷</div>
+    <div class="logo-text"><span class="cn">猪咩岛漫游</span><span class="en">MeeMee Island</span></div>
+  </a>
+
+  <div class="header-center">
+    <nav>
+      <a href="#map">地图<span class="nav-tri"></span></a><div class="nav-divider"></div>
+      <a href="#characters">人物介绍<span class="nav-tri"></span></a><div class="nav-divider"></div>
+      <a href="#story">小故事<span class="nav-tri"></span></a><div class="nav-divider"></div>
+      <a href="#fortune">抽签<span class="nav-tri"></span></a><div class="nav-divider"></div>
+      <a href="#author">联系我<span class="nav-tri"></span></a>
+    </nav>
+  </div>
+
+  <!-- hamburger -->
+  <button class="hamburger" id="hamburger" aria-label="菜单">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#map">地图<svg viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a href="#characters">人物介绍<svg viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a href="#story">小故事<svg viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a href="#fortune">抽签<svg viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+  <a href="#author">联系我<svg viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+</div>
+
+<!-- KV -->
+<section id="kv">
+  <div class="kv-scrim"></div>
+  <div class="kv-overlay">
+    <div class="kv-eyebrow reveal"><span class="dot"></span>Welcome to MeeMee Island</div>
+    <div class="kv-title reveal reveal-d1">在云端，<br>遇见<em>最软萌</em>的自己</div>
+    <p class="kv-desc reveal reveal-d2">这里是漂浮在天空之上的小岛。<br>奶茶猪与汽水咩在这里收集云朵、制造快乐。</p>
+  </div>
+  <div class="kv-map-wrap" id="map">
+    <div class="map-frame">
+      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+        <div style="width:72px;height:72px;border-radius:50%;border:2px dashed rgba(66,43,33,.22);display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.4;">🗺️</div>
+        <span style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--choco);opacity:.35;font-family:sans-serif;">全岛地图 · 替换为你的插图</span>
+        <span style="font-size:10px;color:var(--choco);opacity:.22;font-family:sans-serif;">推荐尺寸 1920 × 1080 px</span>
+      </div>
+      <div id="mapDots"></div>
+      <div class="map-tooltip" id="mapTooltip"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHARACTERS -->
+<section id="characters">
+  <div class="sec-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-en">Characters</span>
+      <div class="sec-line"><span></span><i></i><span></span></div>
+      <h2 class="sec-title">人物介绍</h2>
+    </div>
+  </div>
+  <div class="char-rail-wrap">
+    <button class="rail-arrow left" id="railLeft"><svg viewBox="0 0 14 14"><path d="M9 2L4 7l5 5"/></svg></button>
+    <div class="char-rail" id="charRail"></div>
+    <button class="rail-arrow right" id="railRight"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button>
+  </div>
+  <div class="char-dots" id="charDots"></div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="sec-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-en">Stories</span>
+      <div class="sec-line"><span></span><i></i><span></span></div>
+      <h2 class="sec-title">小故事</h2>
+    </div>
+  </div>
+  <div class="story-layout">
+    <div class="story-left reveal">
+      <span class="story-eyebrow">MeeMee Island Stories</span>
+      <div class="story-vtitle">在云端，<br>漫游。</div>
+      <div class="story-vbody">奶茶猪每天<br>收集最蓬松的云朵<br>汽水咩把每一天<br>都变成小小的节日</div>
+    </div>
+    <div class="story-mosaic reveal reveal-d1">
+      <div class="mosaic-img mi-1"><div class="m-ph"><span class="m-emoji">🌥️</span><span class="m-lbl">故事插图 1 · 560×420px</span></div></div>
+      <div class="mosaic-img mi-2"><div class="m-ph"><span class="m-emoji">🐷</span><span class="m-lbl">故事插图 2 · 420×560px</span></div></div>
+      <div class="mosaic-img mi-3"><div class="m-ph"><span class="m-emoji">☁️</span><span class="m-lbl">故事插图 3 · 460×460px</span></div></div>
+      <div class="mosaic-img mi-4"><div class="m-ph"><span class="m-emoji">🐑</span><span class="m-lbl">故事插图 4 · 600×450px</span></div></div>
+      <div class="mosaic-img mi-5"><div class="m-ph"><span class="m-emoji">🌈</span><span class="m-lbl">故事插图 5 · 320×420px</span></div></div>
+    </div>
+  </div>
+  <div class="story-foot reveal">
+    <div class="story-quote">欢迎来到猪咩岛。<br>在云端，遇见最软萌的自己。</div>
+    <p class="story-sub">这座漂浮在云层之间的小岛，住着两位最重要的守护者。<br>岛上的时间流得很慢，慢得像奶茶里沉底的珍珠。</p>
+    <a href="#" class="btn btn-green">
+      <span class="btn-inner">更多故事</span>
+      <span class="btn-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<!-- FORTUNE -->
+<section id="fortune">
+  <div class="fortune-arch-wrap">
+    <div class="arch-ticker">
+      <div class="arch-ticker-inner">
+        <span>今日漂流签</span><span>云朵开始滚动</span><span>Daily Slip</span><span>掉出一张签</span><span>猪咩岛</span><span>今日漂流签</span><span>云朵开始滚动</span><span>Daily Slip</span><span>掉出一张签</span><span>猪咩岛</span><span>今日漂流签</span><span>云朵开始滚动</span><span>Daily Slip</span><span>掉出一张签</span><span>猪咩岛</span><span>今日漂流签</span><span>云朵开始滚动</span><span>Daily Slip</span><span>掉出一张签</span><span>猪咩岛</span>
+      </div>
+    </div>
+    <div class="arch-shape">
+      <div class="arch-dome">
+        <span class="arch-label">MeeMee Island · Fortune</span>
+        <h2 class="arch-title">漂流签</h2>
+        <p class="arch-desc">每次点击，云朵会滚出一张今天的签。<br>天气事件 · 岛民遭遇 · 神秘道具</p>
+      </div>
+    </div>
+  </div>
+  <div class="fortune-inner">
+    <span class="fortune-tag">Daily Slip · 漂流签</span>
+    <div class="dice-stage"><span class="dice-emoji" id="diceEmoji">🎲</span></div>
+    <div class="slip-wrap">
+      <div class="f-idle" id="fIdle">云朵还在酝酿中 ...</div>
+      <div class="slip-card" id="slipCard" style="display:none;">
+        <div class="slip-img" id="slipImg"><span class="slip-img-emoji" id="slipImgEmoji"></span><span class="slip-img-label" id="slipImgLabel"></span></div>
+        <div class="slip-body">
+          <span class="slip-type" id="slipType"></span>
+          <div class="slip-head" id="slipHead"></div>
+          <div class="slip-text" id="slipText"></div>
+          <div class="slip-effect" id="slipEffect" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-yellow" id="fBtn" style="margin:0 auto;">
+      <span class="btn-inner" id="fBtnTxt">🎲 抽取漂流签</span>
+      <span class="btn-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2v10M3 8l4 4 4-4"/></svg></span>
+    </button>
+    <div class="f-count" id="fCount"></div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section id="author">
+  <div class="sec-wrap">
+    <div class="sec-head reveal">
+      <span class="sec-en">About the Creator</span>
+      <div class="sec-line"><span></span><i></i><span></span></div>
+      <h2 class="sec-title">联系我</h2>
+    </div>
+    <div class="author-inner reveal">
+      <div class="author-img"><span class="ai-icon">👤</span><span class="ai-txt">头像图</span></div>
+      <div class="author-name">猪咩岛の创造者</div>
+      <div class="author-role">Character Designer · Story Creator</div>
+      <p class="author-bio">热爱云朵与软萌生物的创作者，<br>用插画和故事记录猪咩岛上每一个温柔的瞬间。<br>欢迎来找我聊天 ☁️</p>
+      <div class="social-links">
+        <a href="https://www.instagram.com" target="_blank" class="social-btn"><span class="s-icon">📸</span>Instagram</a>
+        <a href="https://www.xiaohongshu.com" target="_blank" class="social-btn"><span class="s-icon">📖</span>小红书</a>
+        <a href="mailto:hello@meemeeisland.com" class="social-btn"><span class="s-icon">✉️</span>联系我</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <div class="footer-logo-mark">🐷</div>
+      <span class="footer-logo-text">猪咩岛漫游 · MeeMee Island</span>
+    </a>
+    <div class="footer-social">
+      <a href="https://www.instagram.com" target="_blank">📸</a>
+      <a href="https://www.xiaohongshu.com" target="_blank">📖</a>
+      <a href="mailto:hello@meemeeisland.com">✉️</a>
+    </div>
+    <span class="footer-copy">© 2025 猪咩岛漫游 · All rights reserved</span>
+  </div>
+</footer>
+
+</div>
+
+<script>
+// ── HELLO ──
+const helloEl=document.getElementById('hello'), mainEl=document.getElementById('mainContent');
+function enterSite(){helloEl.classList.add('hide');setTimeout(()=>{helloEl.style.display='none';mainEl.classList.add('visible');},800);}
+document.getElementById('enterBtn').addEventListener('click',enterSite);
+setTimeout(enterSite,4200);
+
+// ── HAMBURGER ──
+const hbtn=document.getElementById('hamburger'), mmenu=document.getElementById('mobileMenu');
+hbtn.addEventListener('click',()=>{hbtn.classList.toggle('open');mmenu.classList.toggle('open');});
+document.querySelectorAll('.mobile-menu a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    hbtn.classList.remove('open'); mmenu.classList.remove('open');
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// ── NAV ANCHORS ──
+document.querySelectorAll('nav a').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const target=document.querySelector(a.getAttribute('href'));
+    if(!target) return;
+    if(!mainEl.classList.contains('visible')){enterSite();setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),900);}
+    else target.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// ── CHARACTERS ──
+const chars=[
+  {name:'奶茶小猪',en:'Tapioca',role:'副祭司 · 云朵收集者',emoji:'🐷',bg:'linear-gradient(135deg,#fce4ec,#f8b8c8)',strip:'linear-gradient(90deg,#DC312F,#EB9977)',look:'粉色皮肤，圆圆耳朵，螺旋小尾巴',wear:'蓝色背带裤 + 奶油色 T 恤',personality:'温和可靠，动作慢但稳定'},
+  {name:'汽水小羊',en:'Ramune',role:'主祭司 · 气氛制造者',emoji:'🐑',bg:'linear-gradient(135deg,#e3f4f8,#c8e8f8)',strip:'linear-gradient(90deg,#AAC6AD,#7ab8c8)',look:'淡蓝色卷毛，蓝色小尾巴',wear:'黄色连体衣',personality:'好奇心强，活泼'},
+  {name:'长角羊民',en:'Elder Ram',role:'历史学家 · 老师',emoji:'🐏',bg:'linear-gradient(135deg,#f5e8c8,#ede0b8)',strip:'linear-gradient(90deg,#b8a44e,#E4D085)',look:'长角，手持巨大羽毛笔',wear:'学者长袍',personality:'博学沉稳，善于教导'},
+  {name:'黑脸羊民',en:'Servant Sheep',role:'女仆与男仆',emoji:'🐑',bg:'linear-gradient(135deg,#ece8e0,#dcd8d0)',strip:'linear-gradient(90deg,#888,#bbb)',look:'黑色面孔，整洁围裙',wear:'整洁围裙制服',personality:'细心周到，维持岛上安宁'},
+  {name:'山羊羊民',en:'Mountain Goat',role:'冒险家 · 观测者',emoji:'🐐',bg:'linear-gradient(135deg,#dde8c8,#c8d8b0)',strip:'linear-gradient(90deg,#8a9960,#A8B977)',look:'结实体型，手持单筒望远镜',wear:'探险夹克',personality:'勇敢独立，眼界开阔'},
+  {name:'斑点猪民',en:'Spot Pig',role:'商人 · 物资流通',emoji:'🐷',bg:'linear-gradient(135deg,#fae4d8,#f5e4b8)',strip:'linear-gradient(90deg,#EB9977,#E4D085)',look:'斑点花纹，拨动算盘',wear:'商人马甲',personality:'精明活络，热爱交换'},
+  {name:'条纹猪民',en:'Stripe Pig',role:'花农 · 生态维护者',emoji:'🐷',bg:'linear-gradient(135deg,#daeedd,#c8e8c0)',strip:'linear-gradient(90deg,#AAC6AD,#A8B977)',look:'条纹花纹，提着洒水壶',wear:'园艺围裙',personality:'勤劳踏实，热爱自然'},
+  {name:'星点猪民',en:'Star Pig',role:'修补工人 · 首席工程师',emoji:'🐷',bg:'linear-gradient(135deg,#e8e0f8,#d8d0f0)',strip:'linear-gradient(90deg,#9988cc,#b8a8e8)',look:'星点花纹，拿着发光螺丝刀',wear:'工程师工作服',personality:'动手能力强，哪里需要就去哪里'},
+];
+
+const rail=document.getElementById('charRail'), dotsEl=document.getElementById('charDots');
+
+chars.forEach((c,i)=>{
+  const card=document.createElement('div');
+  card.className='char-card';
+  card.innerHTML=`
+    <div class="char-img" style="background:${c.bg}">
+      <div class="c-ph"><span class="c-emoji">${c.emoji}</span><span class="c-lbl">${c.name} 角色图</span><span class="c-dim">推荐 480×400px</span></div>
+    </div>
+    <div class="char-strip" style="background:${c.strip}"></div>
+    <div class="char-body">
+      <div class="char-name-row"><div class="char-name">${c.name}</div><div class="char-en">${c.en}</div></div>
+      <span class="char-role-tag">${c.role}</span>
+      <div class="char-info-list">
+        <div class="char-info-row"><span class="char-info-label">外貌</span><span class="char-info-val">${c.look}</span></div>
+        <div class="char-info-row"><span class="char-info-label">穿着</span><span class="char-info-val">${c.wear}</span></div>
+        <div class="char-info-row"><span class="char-info-label">性格</span><span class="char-info-val">${c.personality}</span></div>
+      </div>
+    </div>`;
+  rail.appendChild(card);
+
+  const dot=document.createElement('div');
+  dot.className='char-dot'+(i===0?' active':'');
+  dot.addEventListener('click',()=>rail.scrollTo({left:i*260,behavior:'smooth'}));
+  dotsEl.appendChild(dot);
+});
+
+// update dot on scroll
+rail.addEventListener('scroll',()=>{
+  const idx=Math.round(rail.scrollLeft/260);
+  document.querySelectorAll('.char-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+});
+
+// drag
+let isDragging=false,startX,scrollLeft;
+rail.addEventListener('mousedown',e=>{isDragging=true;startX=e.pageX-rail.offsetLeft;scrollLeft=rail.scrollLeft;rail.classList.add('grabbing');});
+rail.addEventListener('mouseleave',()=>{isDragging=false;rail.classList.remove('grabbing');});
+rail.addEventListener('mouseup',()=>{isDragging=false;rail.classList.remove('grabbing');});
+rail.addEventListener('mousemove',e=>{if(!isDragging)return;e.preventDefault();rail.scrollLeft=scrollLeft-(e.pageX-rail.offsetLeft-startX);});
+
+// arrows — 持续按住可一直滚动
+let arrowTimer=null;
+function startScroll(dir){
+  rail.scrollBy({left:dir*260,behavior:'smooth'});
+  arrowTimer=setInterval(()=>rail.scrollBy({left:dir*260,behavior:'smooth'}),600);
+}
+function stopScroll(){clearInterval(arrowTimer);}
+document.getElementById('railLeft').addEventListener('mousedown',()=>startScroll(-1));
+document.getElementById('railRight').addEventListener('mousedown',()=>startScroll(1));
+['mouseup','mouseleave'].forEach(ev=>{
+  document.getElementById('railLeft').addEventListener(ev,stopScroll);
+  document.getElementById('railRight').addEventListener(ev,stopScroll);
+});
+
+// ── MAP HOTSPOTS ──
+const spots=[
+  {label:'咩光教会',x:52,y:62,color:'#E4D085'},
+  {label:'智慧古树',x:44,y:55,color:'#A8B977'},
+  {label:'云朵港口',x:34,y:70,color:'#AAC6AD'},
+  {label:'悬崖观测站',x:78,y:50,color:'#EB9977'},
+  {label:'露天集市',x:62,y:72,color:'#f8d4a8'},
+  {label:'珊瑚草地',x:58,y:78,color:'#b8e8b8'},
+  {label:'动力室',x:48,y:82,color:'#d8c8f8'},
+];
+const dotsWrap=document.getElementById('mapDots'),tooltip=document.getElementById('mapTooltip');
+spots.forEach(s=>{
+  const dot=document.createElement('div');
+  dot.className='map-dot';
+  dot.style.cssText=`left:${s.x}%;top:${s.y}%;background:${s.color};color:${s.color};`;
+  dot.addEventListener('mouseenter',()=>{tooltip.textContent=s.label;tooltip.style.left=s.x+'%';tooltip.style.top=s.y+'%';tooltip.style.opacity='1';});
+  dot.addEventListener('mouseleave',()=>{tooltip.style.opacity='0';});
+  dotsWrap.appendChild(dot);
+});
+
+// ── FORTUNE ──
+const slips=[
+  {type:'weather',typeLabel:'天气事件',typeCls:'type-weather',imgBg:'linear-gradient(135deg,#daeedd,#c8e8f0)',imgEmoji:'☁️',imgLabel:'替换签图 400×200px',head:'☁️ 草莓牛奶云飘过',text:'今天所有面包会自动变软。',effect:null},
+  {type:'weather',typeLabel:'天气事件',typeCls:'type-weather',imgBg:'linear-gradient(135deg,#c8d8f0,#b0c8e8)',imgEmoji:'🌧️',imgLabel:'替换签图 400×200px',head:'🌧️ 人工下雨街区失控',text:'接下来三分钟请缓慢移动。',effect:null},
+  {type:'weather',typeLabel:'天气事件',typeCls:'type-weather',imgBg:'linear-gradient(135deg,#f5eec8,#e8d8a8)',imgEmoji:'🌈',imgLabel:'替换签图 400×200px',head:'🌈 云层裂开了一点点',text:'有人看见了很远的海。',effect:null},
+  {type:'weather',typeLabel:'天气事件',typeCls:'type-weather',imgBg:'linear-gradient(135deg,#e0ddd8,#ccc8c0)',imgEmoji:'🌫️',imgLabel:'替换签图 400×200px',head:'🌫️ 岛上起雾',text:'适合忘掉一点事情。',effect:null},
+  {type:'npc',typeLabel:'岛民遭遇',typeCls:'type-npc',imgBg:'linear-gradient(135deg,#fce4ec,#f8b8c8)',imgEmoji:'🐷',imgLabel:'替换签图 400×200px',head:'🐷 奶茶猪送了你一小团热云',text:'今天获得：',effect:'缓慢行动许可'},
+  {type:'npc',typeLabel:'岛民遭遇',typeCls:'type-npc',imgBg:'linear-gradient(135deg,#e3f4f8,#c8e8f8)',imgEmoji:'🐑',imgLabel:'替换签图 400×200px',head:'🐑 汽水小羊邀你试吃失败面包',text:'效果：心情 +2 / 卖相 -10',effect:null},
+  {type:'npc',typeLabel:'岛民遭遇',typeCls:'type-npc',imgBg:'linear-gradient(135deg,#ede0d4,#ddd0c0)',imgEmoji:'🐐',imgLabel:'替换签图 400×200px',head:'🐐 山羊羊民递给你一张画错的地图',text:'你可能会抵达奇怪的地方。',effect:null},
+  {type:'item',typeLabel:'神秘道具',typeCls:'type-item',imgBg:'linear-gradient(135deg,#e8f0f8,#d0e4f4)',imgEmoji:'🫧',imgLabel:'替换签图 400×200px',head:'🫧 获得：半透明围巾',text:'今天不会被坏天气影响。',effect:'防御 +1'},
+  {type:'item',typeLabel:'神秘道具',typeCls:'type-item',imgBg:'linear-gradient(135deg,#fff8e0,#f5e8b0)',imgEmoji:'🔔',imgLabel:'替换签图 400×200px',head:'🔔 获得：会响的小铃铛',text:'附近的人更容易发现你。',effect:'存在感 +3'},
+  {type:'item',typeLabel:'神秘道具',typeCls:'type-item',imgBg:'linear-gradient(135deg,#daeedd,#c8e8e0)',imgEmoji:'☁️',imgLabel:'替换签图 400×200px',head:'☁️ 获得：还没决定形状的云',text:'暂时不知道有什么用。',effect:'效果待定 ...'},
+];
+let drawCount=0,lastIdx=-1;
+document.getElementById('fBtn').addEventListener('click',()=>{
+  const btn=document.getElementById('fBtn'),dice=document.getElementById('diceEmoji');
+  const btnTxt=document.getElementById('fBtnTxt'),card=document.getElementById('slipCard'),idle=document.getElementById('fIdle');
+  btn.disabled=true; btnTxt.textContent='云朵滚动中...';
+  dice.classList.add('rolling'); setTimeout(()=>dice.classList.remove('rolling'),650);
+  let idx; do{idx=Math.floor(Math.random()*slips.length);}while(idx===lastIdx&&slips.length>1); lastIdx=idx;
+  const s=slips[idx];
+  setTimeout(()=>{
+    idle.style.display='none'; card.style.display='block'; card.classList.remove('dropped');
+    document.getElementById('slipImg').style.background=s.imgBg;
+    document.getElementById('slipImgEmoji').textContent=s.imgEmoji;
+    document.getElementById('slipImgLabel').textContent=s.imgLabel;
+    const t=document.getElementById('slipType'); t.textContent=s.typeLabel; t.className='slip-type '+s.typeCls;
+    document.getElementById('slipHead').textContent=s.head;
+    document.getElementById('slipText').textContent=s.text;
+    const eff=document.getElementById('slipEffect');
+    if(s.effect){eff.textContent=s.effect;eff.style.display='inline-block';}else{eff.style.display='none';}
+    requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.add('dropped')));
+    drawCount++; document.getElementById('fCount').textContent='今日已抽 '+drawCount+' 签';
+    btn.disabled=false; btnTxt.textContent='🎲 再抽一签';
+  },700);
+});
+
+// ── SCROLL REVEAL ──
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
