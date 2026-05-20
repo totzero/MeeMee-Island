@@ -330,11 +330,7 @@
   </div>
   <div class="kv-map-wrap" id="map">
     <div class="map-frame">
-      <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
-        <div style="width:72px;height:72px;border-radius:50%;border:2px dashed rgba(66,43,33,.22);display:flex;align-items:center;justify-content:center;font-size:30px;opacity:.4;">🗺️</div>
-        <span style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--choco);opacity:.35;font-family:sans-serif;">全岛地图 · 替换为你的插图</span>
-        <span style="font-size:10px;color:var(--choco);opacity:.22;font-family:sans-serif;">推荐尺寸 1920 × 1080 px</span>
-      </div>
+      <img src="images/TOP.jpg" style="width:100%;height:100%;object-fit:cover;display:block;">
       <div id="mapDots"></div>
       <div class="map-tooltip" id="mapTooltip"></div>
     </div>
@@ -374,11 +370,11 @@
       <div class="story-vbody">奶茶猪每天<br>收集最蓬松的云朵<br>汽水咩把每一天<br>都变成小小的节日</div>
     </div>
     <div class="story-mosaic reveal reveal-d1">
-      <div class="mosaic-img mi-1"><div class="m-ph"><span class="m-emoji">🌥️</span><span class="m-lbl">故事插图 1 · 560×420px</span></div></div>
-      <div class="mosaic-img mi-2"><div class="m-ph"><span class="m-emoji">🐷</span><span class="m-lbl">故事插图 2 · 420×560px</span></div></div>
-      <div class="mosaic-img mi-3"><div class="m-ph"><span class="m-emoji">☁️</span><span class="m-lbl">故事插图 3 · 460×460px</span></div></div>
-      <div class="mosaic-img mi-4"><div class="m-ph"><span class="m-emoji">🐑</span><span class="m-lbl">故事插图 4 · 600×450px</span></div></div>
-      <div class="mosaic-img mi-5"><div class="m-ph"><span class="m-emoji">🌈</span><span class="m-lbl">故事插图 5 · 320×420px</span></div></div>
+      <div class="mosaic-img mi-1"><img src="images/illu_01.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="mosaic-img mi-2"><img src="images/illu_02.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="mosaic-img mi-3"><img src="images/illu_03.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="mosaic-img mi-4"><img src="images/illu_04.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+      <div class="mosaic-img mi-5"><img src="images/illu_05.jpg" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
     </div>
   </div>
   <div class="story-foot reveal">
@@ -501,14 +497,14 @@ document.querySelectorAll('nav a').forEach(a=>{
 
 // ── CHARACTERS ──
 const chars=[
-  {name:'奶茶小猪',en:'Tapioca',role:'副祭司 · 云朵收集者',emoji:'🐷',bg:'linear-gradient(135deg,#fce4ec,#f8b8c8)',strip:'linear-gradient(90deg,#DC312F,#EB9977)',look:'粉色皮肤，圆圆耳朵，螺旋小尾巴',wear:'蓝色背带裤 + 奶油色 T 恤',personality:'温和可靠，动作慢但稳定'},
-  {name:'汽水小羊',en:'Ramune',role:'主祭司 · 气氛制造者',emoji:'🐑',bg:'linear-gradient(135deg,#e3f4f8,#c8e8f8)',strip:'linear-gradient(90deg,#AAC6AD,#7ab8c8)',look:'淡蓝色卷毛，蓝色小尾巴',wear:'黄色连体衣',personality:'好奇心强，活泼'},
-  {name:'长角羊民',en:'Elder Ram',role:'历史学家 · 老师',emoji:'🐏',bg:'linear-gradient(135deg,#f5e8c8,#ede0b8)',strip:'linear-gradient(90deg,#b8a44e,#E4D085)',look:'长角，手持巨大羽毛笔',wear:'学者长袍',personality:'博学沉稳，善于教导'},
-  {name:'黑脸羊民',en:'Servant Sheep',role:'女仆与男仆',emoji:'🐑',bg:'linear-gradient(135deg,#ece8e0,#dcd8d0)',strip:'linear-gradient(90deg,#888,#bbb)',look:'黑色面孔，整洁围裙',wear:'整洁围裙制服',personality:'细心周到，维持岛上安宁'},
-  {name:'山羊羊民',en:'Mountain Goat',role:'冒险家 · 观测者',emoji:'🐐',bg:'linear-gradient(135deg,#dde8c8,#c8d8b0)',strip:'linear-gradient(90deg,#8a9960,#A8B977)',look:'结实体型，手持单筒望远镜',wear:'探险夹克',personality:'勇敢独立，眼界开阔'},
-  {name:'斑点猪民',en:'Spot Pig',role:'商人 · 物资流通',emoji:'🐷',bg:'linear-gradient(135deg,#fae4d8,#f5e4b8)',strip:'linear-gradient(90deg,#EB9977,#E4D085)',look:'斑点花纹，拨动算盘',wear:'商人马甲',personality:'精明活络，热爱交换'},
-  {name:'条纹猪民',en:'Stripe Pig',role:'花农 · 生态维护者',emoji:'🐷',bg:'linear-gradient(135deg,#daeedd,#c8e8c0)',strip:'linear-gradient(90deg,#AAC6AD,#A8B977)',look:'条纹花纹，提着洒水壶',wear:'园艺围裙',personality:'勤劳踏实，热爱自然'},
-  {name:'星点猪民',en:'Star Pig',role:'修补工人 · 首席工程师',emoji:'🐷',bg:'linear-gradient(135deg,#e8e0f8,#d8d0f0)',strip:'linear-gradient(90deg,#9988cc,#b8a8e8)',look:'星点花纹，拿着发光螺丝刀',wear:'工程师工作服',personality:'动手能力强，哪里需要就去哪里'},
+  {name:'奶茶小猪',en:'Tapioca',role:'副祭司 · 云朵收集者',img:'images/08.jpg',strip:'linear-gradient(90deg,#DC312F,#EB9977)',look:'粉色皮肤，圆圆耳朵，螺旋小尾巴',wear:'蓝色背带裤 + 奶油色 T 恤',personality:'温和可靠，动作慢但稳定'},
+  {name:'汽水小羊',en:'Ramune',role:'主祭司 · 气氛制造者',img:'images/07.jpg',strip:'linear-gradient(90deg,#AAC6AD,#7ab8c8)',look:'淡蓝色卷毛，蓝色小尾巴',wear:'黄色连体衣',personality:'好奇心强，活泼'},
+  {name:'长角羊民',en:'Elder Ram',role:'历史学家 · 老师',img:'images/01.jpg',strip:'linear-gradient(90deg,#b8a44e,#E4D085)',look:'长角，手持巨大羽毛笔',wear:'学者长袍',personality:'博学沉稳，善于教导'},
+  {name:'黑脸羊民',en:'Servant Sheep',role:'女仆与男仆',img:'images/02.jpg',strip:'linear-gradient(90deg,#888,#bbb)',look:'黑色面孔，整洁围裙',wear:'整洁围裙制服',personality:'细心周到，维持岛上安宁'},
+  {name:'山羊羊民',en:'Mountain Goat',role:'冒险家 · 观测者',img:'images/03.jpg',strip:'linear-gradient(90deg,#8a9960,#A8B977)',look:'结实体型，手持单筒望远镜',wear:'探险夹克',personality:'勇敢独立，眼界开阔'},
+  {name:'斑点猪民',en:'Spot Pig',role:'商人 · 物资流通',img:'images/04.jpg',strip:'linear-gradient(90deg,#EB9977,#E4D085)',look:'斑点花纹，拨动算盘',wear:'商人马甲',personality:'精明活络，热爱交换'},
+  {name:'条纹猪民',en:'Stripe Pig',role:'花农 · 生态维护者',img:'images/05.jpg',strip:'linear-gradient(90deg,#AAC6AD,#A8B977)',look:'条纹花纹，提着洒水壶',wear:'园艺围裙',personality:'勤劳踏实，热爱自然'},
+  {name:'星点猪民',en:'Star Pig',role:'修补工人 · 首席工程师',img:'images/06.jpg',strip:'linear-gradient(90deg,#9988cc,#b8a8e8)',look:'星点花纹，拿着发光螺丝刀',wear:'工程师工作服',personality:'动手能力强，哪里需要就去哪里'},
 ];
 
 const rail=document.getElementById('charRail'), dotsEl=document.getElementById('charDots');
@@ -516,9 +512,9 @@ const rail=document.getElementById('charRail'), dotsEl=document.getElementById('
 chars.forEach((c,i)=>{
   const card=document.createElement('div');
   card.className='char-card';
-  card.innerHTML=`
-    <div class="char-img" style="background:${c.bg}">
-      <div class="c-ph"><span class="c-emoji">${c.emoji}</span><span class="c-lbl">${c.name} 角色图</span><span class="c-dim">推荐 480×400px</span></div>
+      card.innerHTML=`
+    <div class="char-img">
+      <img src="${c.img}" style="width:100%;height:100%;object-fit:cover;display:block;">
     </div>
     <div class="char-strip" style="background:${c.strip}"></div>
     <div class="char-body">
